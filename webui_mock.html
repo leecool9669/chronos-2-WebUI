@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>Chronos-2 WebUI Demo (Mock)</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #f5f5f7;
+        color: #111827;
+      }
+      .header {
+        padding: 16px 32px;
+        background: linear-gradient(90deg, #111827, #1f2937);
+        color: #f9fafb;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.5);
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .header p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        opacity: 0.85;
+      }
+      .container {
+        max-width: 1080px;
+        margin: 24px auto;
+        padding: 0 24px 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 2fr 1.6fr;
+        gap: 20px;
+        align-items: start;
+      }
+      .panel {
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+        padding: 18px 20px 20px;
+      }
+      .panel h2 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: #4b5563;
+      }
+      textarea,
+      select,
+      input[type="number"],
+      input[type="range"] {
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 8px 10px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      textarea:focus,
+      select:focus,
+      input[type="number"]:focus,
+      input[type="range"]:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+      }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .field {
+        margin-bottom: 14px;
+      }
+      .controls-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: #f9fafb;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+      }
+      .btn-primary span {
+        margin-left: 6px;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.05);
+      }
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 11px;
+      }
+      .tag {
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+      }
+      .plot-placeholder {
+        margin-top: 6px;
+        height: 220px;
+        border-radius: 12px;
+        background: radial-gradient(circle at 0 0, #eef2ff, #e5e7eb);
+        position: relative;
+        overflow: hidden;
+      }
+      .plot-axis-x,
+      .plot-axis-y {
+        position: absolute;
+        background: #9ca3af;
+      }
+      .plot-axis-x {
+        height: 1px;
+        left: 30px;
+        right: 14px;
+        bottom: 32px;
+      }
+      .plot-axis-y {
+        width: 1px;
+        top: 16px;
+        bottom: 40px;
+        left: 30px;
+      }
+      .plot-line-history,
+      .plot-line-forecast {
+        position: absolute;
+        left: 32px;
+        right: 22px;
+        bottom: 40px;
+        height: 130px;
+        border-radius: 999px;
+      }
+      .plot-line-history {
+        border-left: 2px solid rgba(59, 130, 246, 0.9);
+        border-top: 2px solid rgba(59, 130, 246, 0.9);
+        border-right: 2px solid transparent;
+        transform: skewX(-18deg);
+      }
+      .plot-line-forecast {
+        border-left: 2px solid rgba(249, 115, 22, 0.9);
+        border-top: 2px solid rgba(249, 115, 22, 0.9);
+        border-right: 2px solid transparent;
+        transform: translateX(32px) skewX(-12deg);
+      }
+      .legend {
+        position: absolute;
+        right: 16px;
+        top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 11px;
+      }
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.8);
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+      }
+      .dot-history {
+        background: #3b82f6;
+      }
+      .dot-forecast {
+        background: #f97316;
+      }
+      .dot-interval {
+        background: #fbbf24;
+      }
+      .footer {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #6b7280;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Chronos-2 时间序列预测 WebUI（静态示意首页）</h1>
+      <p>
+        该页面用于展示 WebUI 首页的大致布局与交互区域，真实运行时将由 Gradio
+        动态渲染。
+      </p>
+    </div>
+    <div class="container">
+      <div class="grid">
+        <div class="panel">
+          <h2>输入与任务配置</h2>
+          <div class="field">
+            <label>历史时间序列（示例）</label>
+            <textarea>
+12.3, 13.1, 12.8, 14.0, 13.7, 15.2, 15.8, 16.1, 16.8, 17.3, 17.9, 18.4</textarea
+            >
+          </div>
+          <div class="field">
+            <label>协变量描述（自然语言，可选）</label>
+            <textarea placeholder="例如：节假日、价格促销、天气等级等说明信息"></textarea>
+          </div>
+          <div class="controls-row">
+            <div class="field">
+              <label>模型变体</label>
+              <select>
+                <option>chronos-2 (base, 120M)</option>
+                <option>chronos-2-ts (time-series optimized)</option>
+                <option>chronos-2-lite (示意)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>任务类型</label>
+              <select>
+                <option>单变量预测</option>
+                <option>多变量联合预测</option>
+                <option>协变量增强预测</option>
+              </select>
+            </div>
+          </div>
+          <div class="controls-row">
+            <div class="field">
+              <label>预测长度（时间步）</label>
+              <input type="number" value="24" min="4" max="96" step="4" />
+            </div>
+            <div class="field">
+              <label>随机种子</label>
+              <input type="number" value="2026" min="0" max="10000" step="1" />
+            </div>
+          </div>
+          <button class="btn-primary">
+            <span>⏱</span>
+            <span>生成模拟预测</span>
+          </button>
+          <div class="tag-row">
+            <div class="tag">Time Series Forecasting</div>
+            <div class="tag">Chronos-2</div>
+            <div class="tag">Probabilistic Forecast</div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>预测结果可视化（示意）</h2>
+          <div class="plot-placeholder">
+            <div class="plot-axis-x"></div>
+            <div class="plot-axis-y"></div>
+            <div class="plot-line-history"></div>
+            <div class="plot-line-forecast"></div>
+            <div class="legend">
+              <div class="legend-item">
+                <span class="dot dot-history"></span><span>历史观测</span>
+              </div>
+              <div class="legend-item">
+                <span class="dot dot-forecast"></span><span>预测中位数</span>
+              </div>
+              <div class="legend-item">
+                <span class="dot dot-interval"></span><span>不确定性区间</span>
+              </div>
+            </div>
+          </div>
+          <p class="footer">
+            图形区域展示了历史序列与未来预测的连接关系，真正的 Gradio
+            应用中将由 Matplotlib/Plotly 动态绘制。
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
